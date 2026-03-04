@@ -201,9 +201,47 @@ export default function App() {
      File: src/App.jsx
      ---------------------------------------------------------
      Implement fetch logic inside this useEffect.
+     TODO 2.1: File: src/App.jsx
+
+Requirements (write EXACT behavior):
+1) setLoading(true)
+2) setError(null)
+3) fetch from:
+   "https://jsonplaceholder.typicode.com/users"
+4) Convert response to JSON
+5) Store the result:
+   setUsers(data)
+   setFilteredUsers(data)
+6) On error:
+   setError(err.message)
+7) Always (finally):
+   setLoading(false)
+
+Hint:
+- Use an async function inside useEffect, then call it.
+- Check response.ok and throw an Error if it’s false (otherwise errors won’t go to catch cleanly).
+
+
      ========================================================= */
   useEffect(() => {
     // TODO 2.1: Implement fetching users here (see lab instructions)
+    const fetchData = async () => {
+      try{
+         setLoading(true);
+         setError(null)
+
+         const response = await fetch('https://jsonplaceholder.typicode.com/users')
+         const data = await response.json();
+
+         setUsers(data)
+         setFilteredUsers(data)
+      } catch (error){
+         setError(error.message)
+      } finally {
+      setLoading(false);
+    }
+  };
+  fetchData();
   }, []);
 
   /* =========================================================
@@ -212,9 +250,36 @@ export default function App() {
      ---------------------------------------------------------
      Implement filtering logic inside this useEffect.
      Dependency array MUST be: [searchTerm, users]
+     TODO 2.2: File: src/App.jsx
+Implement the filtering logic inside the second useEffect.
+
+Requirements:
+1) If searchTerm is empty:
+   setFilteredUsers(users)
+2) Else:
+   - filter users by name ONLY
+   - case-insensitive match using includes()
+   - then setFilteredUsers(filtered)
+   Hint:
+      - Always compute from the full users array, not from filteredUsers (prevents “double filtering” bugs).
+      - Make sure .toLowerCase() is applied to both user.name and searchTerm.
+Dependency array MUST be:
+   [searchTerm, users]
+
      ========================================================= */
   useEffect(() => {
     // TODO 2.2: Implement filtering users here (see lab instructions)
+    if (searchTerm === "") {
+    // 1) If searchTerm is empty → show all users
+    setFilteredUsers(users);
+  } else {
+    // 2) Filter by name only (case-insensitive)
+    const filtered = users.filter((user) =>
+      user.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    setFilteredUsers(filtered);
+  }
   }, [searchTerm, users]);
 
   // Modal handlers (already complete)
@@ -231,7 +296,7 @@ export default function App() {
   return (
     <div className="app">
       {/* TODO 1.1: Set header className EXACTLY as in lab instructions */}
-      <header className="">
+      <header className="bg-primary text-white py-3 mb-4 shadow">
         <Container>
           <h1 className="h2 mb-0">User Management Dashboard</h1>
           <p className="mb-0 opacity-75">Search users and view details</p>
@@ -254,7 +319,7 @@ export default function App() {
       </Container>
 
       {/* TODO 1.1: Set footer className EXACTLY as in lab instructions */}
-      <footer className="">
+      <footer className="bg-light py-4 mt-5">
         <Container>
           <small className="text-muted">SWE 363 — React Lab</small>
         </Container>
